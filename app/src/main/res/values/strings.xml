@@ -3,4 +3,12 @@
 
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="title_activity_pick_ateam_menu">PickATeamMenu</string>
+
+    <string name="title_activity_main_menu">MainMenu</string>
+
+    <string name="title_activity_admin_menu">AdminMenu</string>
+
+    <string name="title_activity_team_admin_menu">TeamAdminMenu</string>
 </resources>
