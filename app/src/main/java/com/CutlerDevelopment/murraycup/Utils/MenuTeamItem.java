@@ -1,4 +1,4 @@
-package com.CutlerDevelopment.murraycup;
+package com.CutlerDevelopment.murraycup.Utils;
 
 public class MenuTeamItem {
     private String teamName;

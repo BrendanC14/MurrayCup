@@ -10,47 +10,47 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".TeamAdminMenu"
+            android:name=".Activities.TeamAdminMenu"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_team_admin_menu"
-            android:parentActivityName=".AdminMenu"
+            android:parentActivityName=".Activities.AdminMenu"
             android:theme="@style/FullscreenTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.CutlerDevelopment.murraycup.AdminMenu" />
+                android:value="com.CutlerDevelopment.murraycup.Activities.AdminMenu" />
         </activity>
         <activity
-            android:name=".AdminMenu"
+            android:name=".Activities.AdminMenu"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_admin_menu"
-            android:parentActivityName=".MainMenu"
+            android:parentActivityName=".Activities.MainMenu"
             android:theme="@style/FullscreenTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.CutlerDevelopment.murraycup.MainMenu" />
+                android:value="com.CutlerDevelopment.murraycup.Activities.MainMenu" />
         </activity>
         <activity
-            android:name=".MainMenu"
+            android:name=".Activities.MainMenu"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_main_menu"
-            android:parentActivityName=".LoadingScreen"
+            android:parentActivityName=".Activities.LoadingScreen"
             android:theme="@style/FullscreenTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.CutlerDevelopment.murraycup.LoadingScreen" />
+                android:value="com.CutlerDevelopment.murraycup.Activities.LoadingScreen" />
         </activity>
         <activity
-            android:name=".PickATeamMenu"
+            android:name=".Activities.PickATeamMenu"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_pick_ateam_menu"
-            android:parentActivityName=".LoadingScreen"
+            android:parentActivityName=".Activities.LoadingScreen"
             android:theme="@style/FullscreenTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.CutlerDevelopment.murraycup.LoadingScreen" />
+                android:value="com.CutlerDevelopment.murraycup.Activities.LoadingScreen" />
         </activity>
         <activity
-            android:name=".LoadingScreen"
+            android:name=".Activities.LoadingScreen"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/app_name"
             android:theme="@style/FullscreenTheme">

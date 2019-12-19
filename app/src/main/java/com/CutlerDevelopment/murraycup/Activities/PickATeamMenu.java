@@ -1,6 +1,5 @@
-package com.CutlerDevelopment.murraycup;
+package com.CutlerDevelopment.murraycup.Activities;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,20 +10,23 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.CutlerDevelopment.murraycup.Interfaces.TeamDBListener;
+import com.CutlerDevelopment.murraycup.Models.DataHolder;
+import com.CutlerDevelopment.murraycup.Models.Team;
+import com.CutlerDevelopment.murraycup.R;
+import com.CutlerDevelopment.murraycup.Utils.MenuItemAdapter;
+import com.CutlerDevelopment.murraycup.Utils.MenuTeamItem;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 //Creates a list of View items for each team added to the db
 public class PickATeamMenu extends AppCompatActivity {
 
     ListView myListView;
-    ArrayList<MenuTeamItem> myTeamItems;
-    DBListener dbListener;
+    TeamDBListener teamDbListener;
+    Map<Team, MenuTeamItem> TeamMenuItemMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +39,12 @@ public class PickATeamMenu extends AppCompatActivity {
             actionBar.hide();
         }
 
-        myTeamItems = new ArrayList<>();
+        TeamMenuItemMap = new HashMap<>();
         myListView = findViewById(R.id.teamList);
-        fillTeamArrayList();
+        fillTeamMenuItemMap();
         AssignListAdapter();
 
-        dbListener = new DBListener() {
+        teamDbListener = new TeamDBListener() {
             @Override
             public void teamCreated(Team t) {
                 NewTeamAdded(t);
@@ -59,54 +61,58 @@ public class PickATeamMenu extends AppCompatActivity {
             }
         };
 
-        DataHolder.getInstance().dbListener = this.dbListener;
+        DataHolder.getInstance().teamDbListener = this.teamDbListener;
 
 
     }
 
     public void NewTeamAdded(Team t) {
-        AddOneItemToListDisplay(t.GetName(), t.GetColour());
+        MenuTeamItem item = new MenuTeamItem();
+        item.setTeamName(t.GetName());
+        item.setImageName(this.getResources().getIdentifier(t.GetColour(), "drawable", this.getPackageName()));
+        TeamMenuItemMap.put(t, item);
+
+        AssignListAdapter();
     }
 
     public void TeamModified(Team t) {
 
 
-        myTeamItems = new ArrayList<>();
-        fillTeamArrayList();
+        MenuTeamItem item = TeamMenuItemMap.get(t);
+        item.setTeamName(t.GetName());
+        item.setImageName(this.getResources().getIdentifier(t.GetColour(), "drawable", this.getPackageName()));
+
         AssignListAdapter();
     }
 
     public void TeamRemoved(Team t) {
 
-        myTeamItems = new ArrayList<>();
-        fillTeamArrayList();
+        TeamMenuItemMap.remove(t);
         AssignListAdapter();
     }
-    private void fillTeamArrayList() {
+    private void fillTeamMenuItemMap() {
         MenuTeamItem item_none = new MenuTeamItem();
         item_none.setTeamName("None");
         item_none.setImageName(R.drawable.none);
-        myTeamItems.add(item_none);
+        TeamMenuItemMap.put(null, item_none);
+
 
         for(Team t : DataHolder.getInstance().GetAllTeams()) {
             MenuTeamItem item = new MenuTeamItem();
             item.setTeamName(t.GetName());
             item.setImageName(this.getResources().getIdentifier(t.GetColour(), "drawable", this.getPackageName()));
-            myTeamItems.add(item);
+            TeamMenuItemMap.put(t, item);
         }
 
-    }
-    public void AddOneItemToListDisplay(String name, String colour) {
-        MenuTeamItem item = new MenuTeamItem();
-        item.setTeamName(name);
-        item.setImageName(this.getResources().getIdentifier(colour, "drawable", this.getPackageName()));
-        myTeamItems.add(item);
-
-        AssignListAdapter();
     }
 
 
     public void AssignListAdapter() {
+
+        final ArrayList<MenuTeamItem> myTeamItems = new ArrayList<>();
+        for (Map.Entry<Team, MenuTeamItem> pair : TeamMenuItemMap.entrySet()) {
+            myTeamItems.add(pair.getValue());
+        }
 
         MenuItemAdapter myAdapter = new MenuItemAdapter(getApplicationContext(), myTeamItems);
         myListView.setAdapter(myAdapter);

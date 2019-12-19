@@ -1,18 +1,13 @@
-package com.CutlerDevelopment.murraycup;
-
-import android.annotation.SuppressLint;
+package com.CutlerDevelopment.murraycup.Activities;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.MenuItem;
 
-import androidx.core.app.NavUtils;
+import com.CutlerDevelopment.murraycup.R;
 
 public class AdminMenu extends AppCompatActivity {
 

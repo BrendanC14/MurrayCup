@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="#0099cc"
     android:orientation="vertical"
-    tools:context=".TeamAdminMenu">
+    tools:context=".Activities.TeamAdminMenu">
 
     <ListView
         android:id="@+id/teamList"

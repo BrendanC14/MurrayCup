@@ -1,6 +1,4 @@
-package com.CutlerDevelopment.murraycup;
-
-import android.annotation.SuppressLint;
+package com.CutlerDevelopment.murraycup.Activities;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,14 +6,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.core.app.NavUtils;
+import com.CutlerDevelopment.murraycup.Models.DataHolder;
+import com.CutlerDevelopment.murraycup.Models.Team;
+import com.CutlerDevelopment.murraycup.R;
 
 public class MainMenu extends AppCompatActivity {
 
@@ -52,13 +49,6 @@ public class MainMenu extends AppCompatActivity {
     }
 
     public void ChangeTeam(View view) {
-
-        DataHolder dh = DataHolder.getInstance();
-        SharedPreferences settings = getApplicationContext().getSharedPreferences(dh.GetSharedPrefsName(), 0);
-
-
-        dh.UnchooseTeam();
-
         startActivity(new Intent(MainMenu.this, PickATeamMenu.class));
     }
 

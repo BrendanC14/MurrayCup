@@ -1,7 +1,8 @@
-package com.CutlerDevelopment.murraycup;
+package com.CutlerDevelopment.murraycup.Models;
 
 import androidx.annotation.Nullable;
 
+import com.CutlerDevelopment.murraycup.Interfaces.TeamDBListener;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -11,10 +12,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 
 
-public class DataHolder implements DBListener {
+public class DataHolder {
 
     private static DataHolder instance = null;
-    public DBListener dbListener;
+    public TeamDBListener teamDbListener;
 
 
     private DataHolder() {
@@ -60,12 +61,10 @@ public class DataHolder implements DBListener {
         }
         return null;
     }
+    public int GetNextTeamID() {return AllTeams.size() + 1;}
 
     public void ChooseTeam(Team t) {
         this.ChosenTeam = t;
-    }
-    public void UnchooseTeam() {
-        this.ChosenTeam = null;
     }
 
     public void CreateDBListener() {
@@ -74,10 +73,6 @@ public class DataHolder implements DBListener {
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            //TODO: Log exception
-                        }
-
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
                             switch (dc.getType()) {
                                 case ADDED:
@@ -90,8 +85,8 @@ public class DataHolder implements DBListener {
 
                                         Team t = new Team(ID, name, captain, colour, dbKey);
                                         AddTeam(t);
-                                        if (dbListener != null) {
-                                            dbListener.teamCreated(t);
+                                        if (teamDbListener != null) {
+                                            teamDbListener.teamCreated(t);
                                         }
                                     }
                                     break;
@@ -106,8 +101,8 @@ public class DataHolder implements DBListener {
                                     t.ChangeCaptain(newCaptain);
                                     t.ChangeColour(newColour);
 
-                                    if (dbListener != null) {
-                                        dbListener.teamModified(t);
+                                    if (teamDbListener != null) {
+                                        teamDbListener.teamModified(t);
                                     }
                                     break;
                                 case REMOVED:
@@ -115,8 +110,8 @@ public class DataHolder implements DBListener {
                                     Team t2 = DataHolder.getInstance().GetTeamFromID(ID3);
                                     DataHolder.getInstance().RemoveTeam(t2);
 
-                                    if (dbListener != null) {
-                                        dbListener.teamRemoved(t2);
+                                    if (teamDbListener != null) {
+                                        teamDbListener.teamRemoved(t2);
                                     }
 
 
@@ -125,18 +120,5 @@ public class DataHolder implements DBListener {
                         }
                     }
                 });
-    }
-
-    @Override
-    public void teamCreated(Team t) {
-
-    }
-    @Override
-    public void teamModified(Team t) {
-
-    }
-    @Override
-    public void teamRemoved(Team t) {
-
     }
 }
