@@ -34,32 +34,30 @@ public class TeamAdminMenu extends AppCompatActivity {
     Button addButton;
     Button changeButton;
     Button removeButton;
-
     TeamDBListener teamDbListener;
-    DatabaseConnectionHandler dbcHandler;
-
+    DatabaseConnectionHandler dbConnectionHandlerTeamAdmin;
     String teamSelected = "";
     Map<Team, MenuTeamItem> TeamMenuItemMap;
-
     ListView myListView;
     ArrayAdapter<String> spinnerAdapter;
+    DataHolder dataHolderTeamAdmin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_team_admin_menu);
-
+        dbConnectionHandlerTeamAdmin = new DatabaseConnectionHandler();
+        dataHolderTeamAdmin = new DataHolder(dbConnectionHandlerTeamAdmin);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.hide();
         }
 
-        dbcHandler = new DatabaseConnectionHandler();
+        dbConnectionHandlerTeamAdmin = new DatabaseConnectionHandler();
         TeamMenuItemMap = new HashMap<>();
         myListView = findViewById(R.id.teamList);
         fillTeamMenuItemMap();
-        AssignListAdapter();
+        assignListAdapter();
 
         teamNameTextBox = findViewById(R.id.nameText);
         colourSpinner = findViewById(R.id.colourDropdown);
@@ -71,70 +69,58 @@ public class TeamAdminMenu extends AppCompatActivity {
 
         teamDbListener = new TeamDBListener() {
             @Override
-            public void teamCreated(Team t) { NewTeamAdded(t); }
+            public void teamCreated(Team team) { newTeamAdded(team); }
 
             @Override
-            public void teamModified(Team t) {
-                TeamModified(t);
+            public void teamModified(Team team) {
+                TeamAdminMenu.this.teamModified(team);
             }
 
             @Override
-            public void teamRemoved(Team t) {
-                TeamRemoved(t);
+            public void teamRemoved(Team team) {
+                TeamAdminMenu.this.teamRemoved(team);
             }
         };
-        DataHolder.getInstance().teamDbListener = this.teamDbListener;
-
+        dataHolderTeamAdmin.teamDbListener = this.teamDbListener;
         String [] dropdownItems = new String[]{"red", "blue", "white"};
         spinnerAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, dropdownItems);
         colourSpinner.setAdapter(spinnerAdapter);
-
-
     }
 
-    public void NewTeamAdded(Team t) {
-
+    public void newTeamAdded(Team team) {
         MenuTeamItem item = new MenuTeamItem();
-        item.setTeamName(t.GetName());
-        item.setImageName(this.getResources().getIdentifier(t.GetColour(), "drawable", this.getPackageName()));
-        TeamMenuItemMap.put(t, item);
-
-        feedbackTextBox.setText(t.GetName() + " has been added");
-
-        AssignListAdapter();
+        item.setTeamName(team.getName());
+        item.setImageName(this.getResources().getIdentifier(team.getColour(), "drawable", this.getPackageName()));
+        TeamMenuItemMap.put(team, item);
+        feedbackTextBox.setText(team.getName() + " has been added");
+        assignListAdapter();
     }
 
-    public void TeamModified(Team t) {
-
-        MenuTeamItem item = TeamMenuItemMap.get(t);
-        item.setTeamName(t.GetName());
-        item.setImageName(this.getResources().getIdentifier(t.GetColour(), "drawable", this.getPackageName()));
-        feedbackTextBox.setText(t.GetName() + " has been modified");
-        AssignListAdapter();
+    public void teamModified(Team team) {
+        MenuTeamItem item = TeamMenuItemMap.get(team);
+        item.setTeamName(team.getName());
+        item.setImageName(this.getResources().getIdentifier(team.getColour(), "drawable", this.getPackageName()));
+        feedbackTextBox.setText(team.getName() + " has been modified");
+        assignListAdapter();
     }
 
-    public void TeamRemoved(Team t) {
-
-        TeamMenuItemMap.remove(t);
-        feedbackTextBox.setText(t.GetName() + " has been removed");
+    public void teamRemoved(Team team) {
+        TeamMenuItemMap.remove(team);
+        feedbackTextBox.setText(team.getName() + " has been removed");
         teamSelected = "";
-        AssignListAdapter();
+        assignListAdapter();
     }
 
     private void fillTeamMenuItemMap() {
-
-        for(Team t : DataHolder.getInstance().GetAllTeams()) {
+        for(Team team : dataHolderTeamAdmin.getAllTeams()) {
             MenuTeamItem item = new MenuTeamItem();
-            item.setTeamName(t.GetName());
-            item.setImageName(this.getResources().getIdentifier(t.GetColour(), "drawable", this.getPackageName()));
-            TeamMenuItemMap.put(t, item);
+            item.setTeamName(team.getName());
+            item.setImageName(this.getResources().getIdentifier(team.getColour(), "drawable", this.getPackageName()));
+            TeamMenuItemMap.put(team, item);
         }
-
-
     }
 
-    public void AssignListAdapter() {
-
+    public void assignListAdapter() {
         final ArrayList<MenuTeamItem> myTeamItems = new ArrayList<>();
         for (Map.Entry<Team, MenuTeamItem> pair : TeamMenuItemMap.entrySet()) {
             myTeamItems.add(pair.getValue());
@@ -142,20 +128,17 @@ public class TeamAdminMenu extends AppCompatActivity {
 
         MenuItemAdapter myAdapter = new MenuItemAdapter(getApplicationContext(), myTeamItems);
         myListView.setAdapter(myAdapter);
-
         myListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 MenuTeamItem item = myTeamItems.get(i);
-                Team t = DataHolder.getInstance().GetTeamFromName(item.getTeamName());
-                SelectTeam(item);
+                Team t = dataHolderTeamAdmin.getTeamFromName(item.getTeamName());
+                selectTeam(item);
             }
         });
     }
 
-    public void AddTeam(View view) {
-
-
+    public void addTeam(View view) {
         feedbackTextBox.setText("");
         String name = teamNameTextBox.getText().toString();
         String colour = colourSpinner.getSelectedItem().toString();
@@ -172,50 +155,40 @@ public class TeamAdminMenu extends AppCompatActivity {
         }
 
         feedbackTextBox.setText("Just adding...");
-
-
         Map<String, Object> teamMap = new HashMap<>();
-        int ID = DataHolder.getInstance().GetNextTeamID();
+        int ID = dataHolderTeamAdmin.getNextTeamID();
         teamMap.put("ID", ID);
         teamMap.put("Name", name);
         teamMap.put("Colour", colour);
         teamMap.put("Captain", captain);
-
-        dbcHandler.AddDocument("teams", teamMap);
-
+        dbConnectionHandlerTeamAdmin.addDocument("teams", teamMap);
     }
 
-    public void ChangeTeam(View view) {
-
+    public void changeTeam(View view) {
         feedbackTextBox.setText("Changing team...");
-        Team t = DataHolder.getInstance().GetTeamFromName(teamSelected);
-        String fsRef = t.GetFirestoreReference();
+        Team team = dataHolderTeamAdmin.getTeamFromName(teamSelected);
+        String fsRef = team.getFirestoreReference();
         String name = teamNameTextBox.getText().toString();
         String captain = captainNameTextBox.getText().toString();
         String colour = colourSpinner.getSelectedItem().toString();
 
-        if (!t.GetName().equals(name)) {
-            dbcHandler.UpdateDocumentStringField("teams", fsRef, "Name", name);
+        if (!team.getName().equals(name)) {
+            dbConnectionHandlerTeamAdmin.updateDocumentStringField("teams", fsRef, "Name", name);
         }
-        if (!t.GetCaptain().equals(captain)) {
-            dbcHandler.UpdateDocumentStringField("teams", fsRef, "Captain", captain);
+        if (!team.getCaptain().equals(captain)) {
+            dbConnectionHandlerTeamAdmin.updateDocumentStringField("teams", fsRef, "Captain", captain);
         }
-        if (!t.GetColour().equals(colour)) {
-            dbcHandler.UpdateDocumentStringField("teams", fsRef, "Colour", colour);
+        if (!team.getColour().equals(colour)) {
+            dbConnectionHandlerTeamAdmin.updateDocumentStringField("teams", fsRef, "Colour", colour);
         }
-
     }
 
-    public void RemoveTeam(View view) {
-
-        String fsRef = DataHolder.getInstance().GetTeamFromName(teamSelected).GetFirestoreReference();
-        dbcHandler.DeleteDocument("teams", fsRef);
-
+    public void removeTeam(View view) {
+        String fsRef = dataHolderTeamAdmin.getTeamFromName(teamSelected).getFirestoreReference();
+        dbConnectionHandlerTeamAdmin.deleteDocument("teams", fsRef);
     }
 
-    public void SelectTeam(MenuTeamItem i) {
-
-
+    public void selectTeam(MenuTeamItem i) {
         if (i.getTeamName().equals(teamSelected)) {
             teamSelected = "";
             changeButton.setEnabled(false);
@@ -225,18 +198,15 @@ public class TeamAdminMenu extends AppCompatActivity {
             captainNameTextBox.setText("");
         } else {
             teamSelected = i.getTeamName();
-            Team t = DataHolder.getInstance().GetTeamFromName(teamSelected);
+            Team team = dataHolderTeamAdmin.getTeamFromName(teamSelected);
             changeButton.setEnabled(true);
             removeButton.setEnabled(true);
             addButton.setEnabled(false);
 
             teamNameTextBox.setText(i.getTeamName());
-            captainNameTextBox.setText(t.GetCaptain());
-            int spinnerPosition = spinnerAdapter.getPosition(t.GetColour());
+            captainNameTextBox.setText(team.getCaptain());
+            int spinnerPosition = spinnerAdapter.getPosition(team.getColour());
             colourSpinner.setSelection(spinnerPosition);
-
         }
-
-
     }
 }

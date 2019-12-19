@@ -7,6 +7,7 @@ public class MenuTeamItem {
     public void setTeamName(String theTeamName) {
         this.teamName = theTeamName;
     }
+
     public String getTeamName() {
         return this.teamName;
     }
@@ -14,6 +15,7 @@ public class MenuTeamItem {
     public void setImageName(int theImageName) {
         this.imageName = theImageName;
     }
+
     public int getImageName() {
         return this.imageName;
     }

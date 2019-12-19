@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 import com.CutlerDevelopment.murraycup.Interfaces.TeamDBListener;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -13,63 +12,81 @@ import java.util.ArrayList;
 
 
 public class DataHolder {
-
     private static DataHolder instance = null;
     public TeamDBListener teamDbListener;
+    private Team ChosenTeam;
+    private ArrayList<Team> AllTeams;
+    private ArrayList<Fixture> AllFixtures;
+    private String SharedPrefsName = "TeamPrefs";
+    private String SharedPrefsTeamID = "ID";
+    private DatabaseConnectionHandler db;
 
-
-    private DataHolder() {
+    public DataHolder(DatabaseConnectionHandler databaseConnectionHandler) {
+        db = new DatabaseConnectionHandler();
         AllTeams = new ArrayList<>();
         AllFixtures = new ArrayList<>();
-        CreateDBListener();
-    };
-    public static DataHolder getInstance() {
-        if (instance == null) {
-            instance = new DataHolder();
-        }
-        return instance;
+        createDBListener();
+    }//end of constructor
+
+    public Team getChosenTeam() {
+        return ChosenTeam;
     }
-    private Team ChosenTeam;
-    public Team GetChosenTeam() {return ChosenTeam;}
 
-    private ArrayList<Team> AllTeams;
-    public ArrayList<Team> GetAllTeams() {return AllTeams;}
 
-    private ArrayList<Fixture> AllFixtures;
-    public ArrayList<Fixture> GetAllFixtures() {return AllFixtures;}
+    public ArrayList<Team> getAllTeams() {
+        return AllTeams;
+    }
 
-    private String SharedPrefsName = "TeamPrefs";
-    public String GetSharedPrefsName() {return SharedPrefsName;}
-    private String SharedPrefsTeamID = "ID";
-    public String GetSharedPrefsTeamID() {return SharedPrefsTeamID;};
 
-    public void AddTeam(Team t) {
+    public ArrayList<Fixture> getAllFixtures() {
+        return AllFixtures;
+    }
+
+
+    public String getSharedPrefsName() {
+        return SharedPrefsName;
+    }
+
+    public String getSharedPrefsTeamID() {
+        return SharedPrefsTeamID;
+    }
+
+    public void addTeam(Team t) {
         AllTeams.add(t);
     }
-    public void RemoveTeam(Team t) {AllTeams.remove(t);}
-    public Team GetTeamFromID(int ID) {
-        for(Team t : AllTeams) {
-            if (t.GetID() == ID) {return t;}
-        }
-        return null;
+
+    public void removeTeam(Team t) {
+        AllTeams.remove(t);
     }
-    public Team GetTeamFromName(String name) {
-        for(Team t : AllTeams) {
-            if (t.GetName().equals(name)) {
+
+    public Team getTeamFromID(int ID) {
+        for (Team t : AllTeams) {
+            if (t.getID() == ID) {
                 return t;
             }
         }
         return null;
     }
-    public int GetNextTeamID() {return AllTeams.size() + 1;}
 
-    public void ChooseTeam(Team t) {
+    public Team getTeamFromName(String name) {
+        for (Team t : AllTeams) {
+            if (t.getName().equals(name)) {
+                return t;
+            }
+        }
+        return null;
+    }
+
+    public int getNextTeamID() {
+        return AllTeams.size() + 1;
+    }
+
+    public void chooseTeam(Team t) {
         this.ChosenTeam = t;
     }
 
-    public void CreateDBListener() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("teams")
+    public void createDBListener() {
+        db.dbConnection().collection("teams")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
@@ -81,10 +98,10 @@ public class DataHolder {
                                     String name = dc.getDocument().getString("Name");
                                     String captain = dc.getDocument().getString("Captain");
                                     String colour = dc.getDocument().getString("Colour");
-                                    if (DataHolder.getInstance().GetTeamFromID(ID) == null) {
+                                    if (getTeamFromID(ID) == null) {
 
                                         Team t = new Team(ID, name, captain, colour, dbKey);
-                                        AddTeam(t);
+                                        addTeam(t);
                                         if (teamDbListener != null) {
                                             teamDbListener.teamCreated(t);
                                         }
@@ -96,10 +113,10 @@ public class DataHolder {
                                     String newName = dc.getDocument().getString("Name");
                                     String newCaptain = dc.getDocument().getString("Captain");
                                     String newColour = dc.getDocument().getString("Colour");
-                                    Team t = DataHolder.getInstance().GetTeamFromID(ID2);
-                                    t.ChangeName(newName);
-                                    t.ChangeCaptain(newCaptain);
-                                    t.ChangeColour(newColour);
+                                    Team t = getTeamFromID(ID2);
+                                    t.changeName(newName);
+                                    t.changeCaptain(newCaptain);
+                                    t.changeColour(newColour);
 
                                     if (teamDbListener != null) {
                                         teamDbListener.teamModified(t);
@@ -107,8 +124,8 @@ public class DataHolder {
                                     break;
                                 case REMOVED:
                                     int ID3 = dc.getDocument().getLong("ID").intValue();
-                                    Team t2 = DataHolder.getInstance().GetTeamFromID(ID3);
-                                    DataHolder.getInstance().RemoveTeam(t2);
+                                    Team t2 = getTeamFromID(ID3);
+                                    removeTeam(t2);
 
                                     if (teamDbListener != null) {
                                         teamDbListener.teamRemoved(t2);

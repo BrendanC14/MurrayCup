@@ -19,8 +19,9 @@ public class MenuItemAdapter extends BaseAdapter {
 
     public MenuItemAdapter(Context context, ArrayList<MenuTeamItem> aRow) {
         this.singleRow = aRow;
-        thisInflater = ( LayoutInflater.from(context));
+        thisInflater = (LayoutInflater.from(context));
     }
+
     @Override
     public int getCount() {
         return singleRow.size();
@@ -46,7 +47,7 @@ public class MenuItemAdapter extends BaseAdapter {
         TextView teamName = convertView.findViewById(R.id.teamName);
         ImageView teamColour = convertView.findViewById(R.id.teamColour);
 
-        MenuTeamItem currentItem = (MenuTeamItem) getItem(i);
+        MenuTeamItem currentItem = ( MenuTeamItem ) getItem(i);
 
         teamName.setText(currentItem.getTeamName());
         teamColour.setImageResource(currentItem.getImageName());

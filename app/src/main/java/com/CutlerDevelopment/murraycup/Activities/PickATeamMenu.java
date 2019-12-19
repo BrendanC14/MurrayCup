@@ -12,6 +12,7 @@ import android.widget.ListView;
 
 import com.CutlerDevelopment.murraycup.Interfaces.TeamDBListener;
 import com.CutlerDevelopment.murraycup.Models.DataHolder;
+import com.CutlerDevelopment.murraycup.Models.DatabaseConnectionHandler;
 import com.CutlerDevelopment.murraycup.Models.Team;
 import com.CutlerDevelopment.murraycup.R;
 import com.CutlerDevelopment.murraycup.Utils.MenuItemAdapter;
@@ -27,12 +28,15 @@ public class PickATeamMenu extends AppCompatActivity {
     ListView myListView;
     TeamDBListener teamDbListener;
     Map<Team, MenuTeamItem> TeamMenuItemMap;
+    DatabaseConnectionHandler dbPickTeamMenuActivity;
+    DataHolder dataHolderPickTeamMenuActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_pick_ateam_menu);
+        dbPickTeamMenuActivity = new DatabaseConnectionHandler();
+        dataHolderPickTeamMenuActivity = new DataHolder(dbPickTeamMenuActivity);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -42,53 +46,47 @@ public class PickATeamMenu extends AppCompatActivity {
         TeamMenuItemMap = new HashMap<>();
         myListView = findViewById(R.id.teamList);
         fillTeamMenuItemMap();
-        AssignListAdapter();
+        assignListAdapter();
 
         teamDbListener = new TeamDBListener() {
             @Override
             public void teamCreated(Team t) {
-                NewTeamAdded(t);
+                newTeamAdded(t);
             }
 
             @Override
             public void teamModified(Team t) {
-                TeamModified(t);
+                PickATeamMenu.this.teamModified(t);
             }
 
             @Override
             public void teamRemoved(Team t) {
-                TeamRemoved(t);
+                PickATeamMenu.this.teamRemoved(t);
             }
         };
-
-        DataHolder.getInstance().teamDbListener = this.teamDbListener;
-
-
+        dataHolderPickTeamMenuActivity.teamDbListener = this.teamDbListener;
     }
 
-    public void NewTeamAdded(Team t) {
+    public void newTeamAdded(Team t) {
         MenuTeamItem item = new MenuTeamItem();
-        item.setTeamName(t.GetName());
-        item.setImageName(this.getResources().getIdentifier(t.GetColour(), "drawable", this.getPackageName()));
+        item.setTeamName(t.getName());
+        item.setImageName(this.getResources().getIdentifier(t.getColour(), "drawable", this.getPackageName()));
         TeamMenuItemMap.put(t, item);
-
-        AssignListAdapter();
+        assignListAdapter();
     }
 
-    public void TeamModified(Team t) {
-
+    public void teamModified(Team t) {
 
         MenuTeamItem item = TeamMenuItemMap.get(t);
-        item.setTeamName(t.GetName());
-        item.setImageName(this.getResources().getIdentifier(t.GetColour(), "drawable", this.getPackageName()));
-
-        AssignListAdapter();
+        item.setTeamName(t.getName());
+        item.setImageName(this.getResources().getIdentifier(t.getColour(), "drawable", this.getPackageName()));
+        assignListAdapter();
     }
 
-    public void TeamRemoved(Team t) {
+    public void teamRemoved(Team t) {
 
         TeamMenuItemMap.remove(t);
-        AssignListAdapter();
+        assignListAdapter();
     }
     private void fillTeamMenuItemMap() {
         MenuTeamItem item_none = new MenuTeamItem();
@@ -96,61 +94,49 @@ public class PickATeamMenu extends AppCompatActivity {
         item_none.setImageName(R.drawable.none);
         TeamMenuItemMap.put(null, item_none);
 
-
-        for(Team t : DataHolder.getInstance().GetAllTeams()) {
+        for(Team t : dataHolderPickTeamMenuActivity.getAllTeams()) {
             MenuTeamItem item = new MenuTeamItem();
-            item.setTeamName(t.GetName());
-            item.setImageName(this.getResources().getIdentifier(t.GetColour(), "drawable", this.getPackageName()));
+            item.setTeamName(t.getName());
+            item.setImageName(this.getResources().getIdentifier(t.getColour(), "drawable", this.getPackageName()));
             TeamMenuItemMap.put(t, item);
         }
-
     }
 
 
-    public void AssignListAdapter() {
-
+    public void assignListAdapter() {
         final ArrayList<MenuTeamItem> myTeamItems = new ArrayList<>();
         for (Map.Entry<Team, MenuTeamItem> pair : TeamMenuItemMap.entrySet()) {
             myTeamItems.add(pair.getValue());
         }
-
         MenuItemAdapter myAdapter = new MenuItemAdapter(getApplicationContext(), myTeamItems);
         myListView.setAdapter(myAdapter);
-
         myListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 MenuTeamItem item = myTeamItems.get(i);
-                SelectTeam(item);
+                selectTeam(item);
             }
         });
     }
 
-    public void SelectTeam(MenuTeamItem i) {
-        DataHolder dh = DataHolder.getInstance();
+    public void selectTeam(MenuTeamItem i) {
         if (i != null) {
-
-            Team t = dh.GetTeamFromName(i.getTeamName());
+            Team t = dataHolderPickTeamMenuActivity.getTeamFromName(i.getTeamName());
             if (t != null) {
-                dh.ChooseTeam(t);
-
-                SharedPreferences settings = getApplicationContext().getSharedPreferences(dh.GetSharedPrefsName(), 0);
+                dataHolderPickTeamMenuActivity.chooseTeam(t);
+                SharedPreferences settings = getApplicationContext().getSharedPreferences(dataHolderPickTeamMenuActivity.getSharedPrefsName(), 0);
                 SharedPreferences.Editor editor = settings.edit();
-
-                editor.putInt(dh.GetSharedPrefsTeamID(), t.GetID());
+                editor.putInt(dataHolderPickTeamMenuActivity.getSharedPrefsTeamID(), t.getID());
                 editor.apply();
             }
             else {
-                SharedPreferences settings = getApplicationContext().getSharedPreferences(dh.GetSharedPrefsName(), 0);
+                SharedPreferences settings = getApplicationContext().getSharedPreferences(dataHolderPickTeamMenuActivity.getSharedPrefsName(), 0);
                 SharedPreferences.Editor editor = settings.edit();
-
-                editor.putInt(dh.GetSharedPrefsTeamID(), -1);
+                editor.putInt(dataHolderPickTeamMenuActivity.getSharedPrefsTeamID(), -1);
                 editor.apply();
 
             }
         }
-
-
         startActivity(new Intent(PickATeamMenu.this, MainMenu.class));
     }
 

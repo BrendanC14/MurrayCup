@@ -2,47 +2,62 @@ package com.CutlerDevelopment.murraycup.Models;
 
 public class Team {
 
-    private int ID;
-    private String FirestoreReference;
-    private String Name;
-    private String Captain;
-    private String Colour;
-    private String Group;
+    private int id;
+    private String name;
+    private String captain;
+    private String colour;
+    private String firestoreReference;
+    private String group;
 
     public Team(int theID, String theName, String theCaptain, String theColour, String fbRef) {
-        this.ID = theID;
-        this.Name = theName;
-        this.Captain = theCaptain;
-        this.Colour = theColour;
-        this.FirestoreReference = fbRef;
+        this.id = theID;
+        this.name = theName;
+        this.captain = theCaptain;
+        this.colour = theColour;
+        this.firestoreReference = fbRef;
     }
 
-    public int GetID() {return this.ID;}
-    public String GetFirestoreReference() {return this.FirestoreReference;}
-    public String GetName() {
-        return this.Name;
-    }
-    public String GetCaptain() {
-        return this.Captain;
-    }
-    public String GetColour() {
-        return this.Colour;
-    }
-    public String GetGroup() {
-        return this.Group;
+    public int getID() {
+        return id;
     }
 
-    public void ChangeID(int newID) {this.ID = newID;}
-    public void ChangeName(String newName) {
-        this.Name = newName;
+    public String getFirestoreReference() {
+        return firestoreReference;
     }
-    public void ChangeCaptain(String newCaptain) {
-        this.Captain = newCaptain;
+
+    public String getName() {
+        return name;
     }
-    public void ChangeColour(String newColour) {
-        this.Colour = newColour;
+
+    public String getCaptain() {
+        return captain;
     }
-    public void SetGroup(String newGroup) {
-        this.Group = newGroup;
+
+    public String getColour() {
+        return colour;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void changeID(int newID) {
+        id = newID;
+    }
+
+    public void changeName(String newName) {
+        name = newName;
+    }
+
+    public void changeCaptain(String newCaptain) {
+        captain = newCaptain;
+    }
+
+    public void changeColour(String newColour) {
+        colour = newColour;
+    }
+
+    public void setGroup(String newGroup) {
+        group = newGroup;
     }
 }
