@@ -9,7 +9,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class DataHolder {
@@ -21,6 +23,7 @@ public class DataHolder {
     private DataHolder() {
         AllTeams = new ArrayList<>();
         AllFixtures = new ArrayList<>();
+        AllGroups = new HashMap<>();
         CreateDBListener();
     };
     public static DataHolder getInstance() {
@@ -29,22 +32,21 @@ public class DataHolder {
         }
         return instance;
     }
-    private Team ChosenTeam;
-    public Team GetChosenTeam() {return ChosenTeam;}
-
-    private ArrayList<Team> AllTeams;
-    public ArrayList<Team> GetAllTeams() {return AllTeams;}
-
-    private ArrayList<Fixture> AllFixtures;
-    public ArrayList<Fixture> GetAllFixtures() {return AllFixtures;}
 
     private String SharedPrefsName = "TeamPrefs";
     public String GetSharedPrefsName() {return SharedPrefsName;}
     private String SharedPrefsTeamID = "ID";
     public String GetSharedPrefsTeamID() {return SharedPrefsTeamID;};
 
+    private Team ChosenTeam;
+    public Team GetChosenTeam() {return ChosenTeam;}
+    private ArrayList<Team> AllTeams;
+    public ArrayList<Team> GetAllTeams() {return AllTeams;}
     public void AddTeam(Team t) {
-        AllTeams.add(t);
+        if (GetTeamFromID(t.GetID()) == null) {
+            AllTeams.add(t);
+            AddTeamToGroup(t.GetGroup(), t);
+        }
     }
     public void RemoveTeam(Team t) {AllTeams.remove(t);}
     public Team GetTeamFromID(int ID) {
@@ -62,9 +64,32 @@ public class DataHolder {
         return null;
     }
     public int GetNextTeamID() {return AllTeams.size() + 1;}
-
     public void ChooseTeam(Team t) {
         this.ChosenTeam = t;
+    }
+
+    private HashMap<Integer, ArrayList<Team>> AllGroups;
+    public HashMap<Integer, ArrayList<Team>> GetAllGroups() {return AllGroups; }
+    public void AddTeamToGroup(int groupNumber, Team t) {
+        if (!AllGroups.containsKey(groupNumber)) {
+            AllGroups.put(groupNumber, new ArrayList<Team>());
+        }
+        AllGroups.get(groupNumber).add(t);
+    }
+    public ArrayList<Team> GetAllTeamsInAGroup(int groupNumber) {
+        if (AllGroups.containsKey(groupNumber)) {
+            return AllGroups.get(groupNumber);
+        }
+        return new ArrayList<>();
+    }
+
+
+    private ArrayList<Fixture> AllFixtures;
+    public ArrayList<Fixture> GetAllFixtures() {return AllFixtures;}
+    public void AddFixture(Fixture fixture) {
+        AllFixtures.add(fixture);
+        GetTeamFromID(fixture.GetHomeTeamID()).AddFixture(fixture);
+        GetTeamFromID(fixture.GetAwayTeamID()).AddFixture(fixture);
     }
 
     public void CreateDBListener() {
@@ -81,10 +106,14 @@ public class DataHolder {
                                     String name = dc.getDocument().getString("Name");
                                     String captain = dc.getDocument().getString("Captain");
                                     String colour = dc.getDocument().getString("Colour");
+                                    int group = dc.getDocument().getLong("Group").intValue();
                                     if (DataHolder.getInstance().GetTeamFromID(ID) == null) {
 
-                                        Team t = new Team(ID, name, captain, colour, dbKey);
-                                        AddTeam(t);
+                                        Team t = new Team(ID, name, captain, colour, group, dbKey);
+                                        if (GetTeamFromName(name) == null) {
+                                            AddTeam(t);
+                                        }
+
                                         if (teamDbListener != null) {
                                             teamDbListener.teamCreated(t);
                                         }
@@ -96,11 +125,12 @@ public class DataHolder {
                                     String newName = dc.getDocument().getString("Name");
                                     String newCaptain = dc.getDocument().getString("Captain");
                                     String newColour = dc.getDocument().getString("Colour");
+                                    int newGroup = dc.getDocument().getLong("Group").intValue();
                                     Team t = DataHolder.getInstance().GetTeamFromID(ID2);
                                     t.ChangeName(newName);
                                     t.ChangeCaptain(newCaptain);
                                     t.ChangeColour(newColour);
-
+                                    t.SetGroup((newGroup));
                                     if (teamDbListener != null) {
                                         teamDbListener.teamModified(t);
                                     }

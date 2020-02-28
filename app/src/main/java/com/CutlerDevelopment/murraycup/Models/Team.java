@@ -1,5 +1,7 @@
 package com.CutlerDevelopment.murraycup.Models;
 
+import java.util.ArrayList;
+
 public class Team {
 
     private int ID;
@@ -7,14 +9,17 @@ public class Team {
     private String Name;
     private String Captain;
     private String Colour;
-    private String Group;
+    private int Group;
+    private ArrayList<Fixture> AllFixtures;
 
-    public Team(int theID, String theName, String theCaptain, String theColour, String fbRef) {
+    public Team(int theID, String theName, String theCaptain, String theColour, int theGroup, String fbRef) {
         this.ID = theID;
         this.Name = theName;
         this.Captain = theCaptain;
         this.Colour = theColour;
+        this.Group = theGroup;
         this.FirestoreReference = fbRef;
+        this.AllFixtures = new ArrayList<>();
     }
 
     public int GetID() {return this.ID;}
@@ -28,9 +33,10 @@ public class Team {
     public String GetColour() {
         return this.Colour;
     }
-    public String GetGroup() {
+    public int GetGroup() {
         return this.Group;
     }
+    public ArrayList<Fixture> GetAllFixtures() { return AllFixtures; }
 
     public void ChangeID(int newID) {this.ID = newID;}
     public void ChangeName(String newName) {
@@ -42,7 +48,6 @@ public class Team {
     public void ChangeColour(String newColour) {
         this.Colour = newColour;
     }
-    public void SetGroup(String newGroup) {
-        this.Group = newGroup;
-    }
+    public void SetGroup(int newGroup) { this.Group = newGroup; }
+    public void AddFixture(Fixture fixture) { AllFixtures.add(fixture); }
 }

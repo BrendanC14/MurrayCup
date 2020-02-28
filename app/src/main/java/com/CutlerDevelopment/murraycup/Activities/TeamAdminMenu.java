@@ -3,6 +3,7 @@ package com.CutlerDevelopment.murraycup.Activities;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -179,6 +180,7 @@ public class TeamAdminMenu extends AppCompatActivity {
         teamMap.put("ID", ID);
         teamMap.put("Name", name);
         teamMap.put("Colour", colour);
+        teamMap.put("Group", 0);
         teamMap.put("Captain", captain);
 
         dbcHandler.AddDocument("teams", teamMap);
@@ -238,5 +240,14 @@ public class TeamAdminMenu extends AppCompatActivity {
         }
 
 
+    }
+
+
+    @Override
+    public void onBackPressed() {
+
+        DataHolder.getInstance().teamDbListener = null;
+        startActivity(new Intent(TeamAdminMenu.this, AdminMenu.class));
+        finish();
     }
 }

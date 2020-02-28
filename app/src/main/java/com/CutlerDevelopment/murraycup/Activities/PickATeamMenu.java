@@ -143,7 +143,7 @@ public class PickATeamMenu extends AppCompatActivity {
             else {
                 SharedPreferences settings = getApplicationContext().getSharedPreferences(dh.GetSharedPrefsName(), 0);
                 SharedPreferences.Editor editor = settings.edit();
-
+                dh.ChooseTeam(null);
                 editor.putInt(dh.GetSharedPrefsTeamID(), -1);
                 editor.apply();
 
@@ -151,7 +151,9 @@ public class PickATeamMenu extends AppCompatActivity {
         }
 
 
+        DataHolder.getInstance().teamDbListener = null;
         startActivity(new Intent(PickATeamMenu.this, MainMenu.class));
+        finish();
     }
 
 }

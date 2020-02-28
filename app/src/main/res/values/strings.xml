@@ -11,4 +11,8 @@
     <string name="title_activity_admin_menu">AdminMenu</string>
 
     <string name="title_activity_team_admin_menu">TeamAdminMenu</string>
+
+    <string name="title_activity_group_admin_menu">GroupAdminMenu</string>
+
+    <string name="title_activity_fixture_admin_menu">FixtureAdminMenu</string>
 </resources>

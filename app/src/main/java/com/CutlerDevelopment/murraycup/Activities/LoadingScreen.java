@@ -10,8 +10,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.CutlerDevelopment.murraycup.Models.DataHolder;
+import com.CutlerDevelopment.murraycup.Models.Fixture;
 import com.CutlerDevelopment.murraycup.Models.Team;
 import com.CutlerDevelopment.murraycup.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -19,6 +21,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import io.opencensus.tags.Tag;
 
 
 public class LoadingScreen extends AppCompatActivity {
@@ -40,7 +44,6 @@ public class LoadingScreen extends AppCompatActivity {
 
         GetTeams();
 
-
     //Nothing more is done when this page is created, except to show it saying "Loading".
         //Once the listener knows the teams documents have been returned we'll then progress.
 
@@ -61,7 +64,28 @@ public class LoadingScreen extends AppCompatActivity {
                                         doc.getString("Name"),
                                         doc.getString("Captain"),
                                         doc.getString("Colour"),
+                                        doc.getLong("Group").intValue(),
                                         doc.getId()));
+                            }
+                            GetFixtures();
+                        }
+                    }
+                });
+    }
+
+    public void GetFixtures() {
+        db.collection("fixtures").get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot doc : task.getResult()) {
+
+                                DataHolder.getInstance().AddFixture(new Fixture(
+                                        doc.getLong("HomeTeam").intValue(),
+                                        doc.getLong("AwayTeam").intValue(),
+                                        doc.getTimestamp("Time").toDate(),
+                                        doc.getLong("Pitch").intValue()));
                             }
                             CheckTeamChosen();
                         }
@@ -77,10 +101,12 @@ public class LoadingScreen extends AppCompatActivity {
 
         if (teamID == 0) {
             startActivity(new Intent(LoadingScreen.this, PickATeamMenu.class));
+            finish();
         }
         else {
             dh.ChooseTeam(dh.GetTeamFromID(teamID));
             startActivity(new Intent(LoadingScreen.this, MainMenu.class));
+            finish();
 
         }
     }

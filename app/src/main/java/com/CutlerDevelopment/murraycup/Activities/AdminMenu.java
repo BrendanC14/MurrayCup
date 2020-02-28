@@ -27,4 +27,12 @@ public class AdminMenu extends AppCompatActivity {
     public void OpenTeamAdminMenu(View view) {
         startActivity(new Intent(AdminMenu.this, TeamAdminMenu.class));
     }
+
+    public void OpenGroupAdminMenu(View view) {
+        startActivity(new Intent(AdminMenu.this, GroupAdminMenu.class));
+    }
+
+    public void OpenFixturedminMenu(View view) {
+        startActivity(new Intent(AdminMenu.this, FixtureAdminMenu.class));
+    }
 }
