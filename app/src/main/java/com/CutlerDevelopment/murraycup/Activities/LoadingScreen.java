@@ -84,8 +84,11 @@ public class LoadingScreen extends AppCompatActivity {
                                 DataHolder.getInstance().AddFixture(new Fixture(
                                         doc.getLong("HomeTeam").intValue(),
                                         doc.getLong("AwayTeam").intValue(),
+                                        doc.getLong("HomeScore").intValue(),
+                                        doc.getLong("AwayScore").intValue(),
                                         doc.getTimestamp("Time").toDate(),
-                                        doc.getLong("Pitch").intValue()));
+                                        doc.getLong("Pitch").intValue(),
+                                        doc.getId()));
                             }
                             CheckTeamChosen();
                         }

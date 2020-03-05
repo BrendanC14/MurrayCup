@@ -1,17 +1,10 @@
 package com.CutlerDevelopment.murraycup.Activities;
 
-import android.annotation.SuppressLint;
-
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.MenuItem;
-
-import androidx.core.app.NavUtils;
 
 import com.CutlerDevelopment.murraycup.Models.DataHolder;
 import com.CutlerDevelopment.murraycup.Models.DatabaseConnectionHandler;
@@ -48,26 +41,25 @@ public class FixtureAdminMenu extends AppCompatActivity {
 
     public void CreateFixtures(View view) {
 
+        for (Fixture f : DataHolder.getInstance().GetAllFixtures()) {
+            dbcHandler.DeleteDocument("fixtures", f.getFirestoreReference());
+        }
+
         for (Map.Entry<Integer, ArrayList<Team>> entry : DataHolder.getInstance().GetAllGroups().entrySet()) {
             int teamCount = entry.getValue().size();
 
             for (int homeTeam = 0; homeTeam < teamCount; homeTeam++) {
                 for (int awayTeam = homeTeam + 1; awayTeam < teamCount; awayTeam++) {
-                    int homeID = entry.getValue().get(homeTeam).GetID();
-                    int awayID = entry.getValue().get(awayTeam).GetID();
-                    Date time = new Date(2020,07,21,9,15,00);
-                    int pitch = 1;
-                    Fixture f = new Fixture(homeID, awayID, time, pitch );
-
-                    entry.getValue().get(homeTeam).AddFixture(f);
-                    entry.getValue().get(awayTeam).AddFixture(f);
-                    DataHolder.getInstance().AddFixture(f);
-
+                    int homeID = entry.getValue().get(homeTeam).getID();
+                    int awayID = entry.getValue().get(awayTeam).getID();
+                    Date time = new Date(2020,7,21,9,15,00);
+                    int pitch = entry.getValue().get(homeTeam).getGroup();
 
                     Map<String, Object> fixtureMap = new HashMap<>();
-                    int ID = DataHolder.getInstance().GetNextTeamID();
                     fixtureMap.put("HomeTeam", homeID);
+                    fixtureMap.put("HomeScore", -1);
                     fixtureMap.put("AwayTeam", awayID);
+                    fixtureMap.put("AwayScore", -1);
                     fixtureMap.put("Time", time);
                     fixtureMap.put("Pitch", pitch);
 

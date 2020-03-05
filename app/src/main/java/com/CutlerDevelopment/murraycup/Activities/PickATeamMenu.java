@@ -68,8 +68,8 @@ public class PickATeamMenu extends AppCompatActivity {
 
     public void NewTeamAdded(Team t) {
         MenuTeamItem item = new MenuTeamItem();
-        item.setTeamName(t.GetName());
-        item.setImageName(this.getResources().getIdentifier(t.GetColour(), "drawable", this.getPackageName()));
+        item.setTeamName(t.getName());
+        item.setImageName(this.getResources().getIdentifier(t.getColour(), "drawable", this.getPackageName()));
         TeamMenuItemMap.put(t, item);
 
         AssignListAdapter();
@@ -79,8 +79,8 @@ public class PickATeamMenu extends AppCompatActivity {
 
 
         MenuTeamItem item = TeamMenuItemMap.get(t);
-        item.setTeamName(t.GetName());
-        item.setImageName(this.getResources().getIdentifier(t.GetColour(), "drawable", this.getPackageName()));
+        item.setTeamName(t.getName());
+        item.setImageName(this.getResources().getIdentifier(t.getColour(), "drawable", this.getPackageName()));
 
         AssignListAdapter();
     }
@@ -99,8 +99,8 @@ public class PickATeamMenu extends AppCompatActivity {
 
         for(Team t : DataHolder.getInstance().GetAllTeams()) {
             MenuTeamItem item = new MenuTeamItem();
-            item.setTeamName(t.GetName());
-            item.setImageName(this.getResources().getIdentifier(t.GetColour(), "drawable", this.getPackageName()));
+            item.setTeamName(t.getName());
+            item.setImageName(this.getResources().getIdentifier(t.getColour(), "drawable", this.getPackageName()));
             TeamMenuItemMap.put(t, item);
         }
 
@@ -137,7 +137,7 @@ public class PickATeamMenu extends AppCompatActivity {
                 SharedPreferences settings = getApplicationContext().getSharedPreferences(dh.GetSharedPrefsName(), 0);
                 SharedPreferences.Editor editor = settings.edit();
 
-                editor.putInt(dh.GetSharedPrefsTeamID(), t.GetID());
+                editor.putInt(dh.GetSharedPrefsTeamID(), t.getID());
                 editor.apply();
             }
             else {

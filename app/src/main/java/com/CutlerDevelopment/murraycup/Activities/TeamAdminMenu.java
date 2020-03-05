@@ -96,11 +96,11 @@ public class TeamAdminMenu extends AppCompatActivity {
     public void NewTeamAdded(Team t) {
 
         MenuTeamItem item = new MenuTeamItem();
-        item.setTeamName(t.GetName());
-        item.setImageName(this.getResources().getIdentifier(t.GetColour(), "drawable", this.getPackageName()));
+        item.setTeamName(t.getName());
+        item.setImageName(this.getResources().getIdentifier(t.getColour(), "drawable", this.getPackageName()));
         TeamMenuItemMap.put(t, item);
 
-        feedbackTextBox.setText(t.GetName() + " has been added");
+        feedbackTextBox.setText(t.getName() + " has been added");
 
         AssignListAdapter();
     }
@@ -108,16 +108,16 @@ public class TeamAdminMenu extends AppCompatActivity {
     public void TeamModified(Team t) {
 
         MenuTeamItem item = TeamMenuItemMap.get(t);
-        item.setTeamName(t.GetName());
-        item.setImageName(this.getResources().getIdentifier(t.GetColour(), "drawable", this.getPackageName()));
-        feedbackTextBox.setText(t.GetName() + " has been modified");
+        item.setTeamName(t.getName());
+        item.setImageName(this.getResources().getIdentifier(t.getColour(), "drawable", this.getPackageName()));
+        feedbackTextBox.setText(t.getName() + " has been modified");
         AssignListAdapter();
     }
 
     public void TeamRemoved(Team t) {
 
         TeamMenuItemMap.remove(t);
-        feedbackTextBox.setText(t.GetName() + " has been removed");
+        feedbackTextBox.setText(t.getName() + " has been removed");
         teamSelected = "";
         AssignListAdapter();
     }
@@ -126,8 +126,8 @@ public class TeamAdminMenu extends AppCompatActivity {
 
         for(Team t : DataHolder.getInstance().GetAllTeams()) {
             MenuTeamItem item = new MenuTeamItem();
-            item.setTeamName(t.GetName());
-            item.setImageName(this.getResources().getIdentifier(t.GetColour(), "drawable", this.getPackageName()));
+            item.setTeamName(t.getName());
+            item.setImageName(this.getResources().getIdentifier(t.getColour(), "drawable", this.getPackageName()));
             TeamMenuItemMap.put(t, item);
         }
 
@@ -191,18 +191,18 @@ public class TeamAdminMenu extends AppCompatActivity {
 
         feedbackTextBox.setText("Changing team...");
         Team t = DataHolder.getInstance().GetTeamFromName(teamSelected);
-        String fsRef = t.GetFirestoreReference();
+        String fsRef = t.getFirestoreReference();
         String name = teamNameTextBox.getText().toString();
         String captain = captainNameTextBox.getText().toString();
         String colour = colourSpinner.getSelectedItem().toString();
 
-        if (!t.GetName().equals(name)) {
+        if (!t.getName().equals(name)) {
             dbcHandler.UpdateDocumentStringField("teams", fsRef, "Name", name);
         }
-        if (!t.GetCaptain().equals(captain)) {
+        if (!t.getCaptain().equals(captain)) {
             dbcHandler.UpdateDocumentStringField("teams", fsRef, "Captain", captain);
         }
-        if (!t.GetColour().equals(colour)) {
+        if (!t.getColour().equals(colour)) {
             dbcHandler.UpdateDocumentStringField("teams", fsRef, "Colour", colour);
         }
 
@@ -210,7 +210,7 @@ public class TeamAdminMenu extends AppCompatActivity {
 
     public void RemoveTeam(View view) {
 
-        String fsRef = DataHolder.getInstance().GetTeamFromName(teamSelected).GetFirestoreReference();
+        String fsRef = DataHolder.getInstance().GetTeamFromName(teamSelected).getFirestoreReference();
         dbcHandler.DeleteDocument("teams", fsRef);
 
     }
@@ -233,8 +233,8 @@ public class TeamAdminMenu extends AppCompatActivity {
             addButton.setEnabled(false);
 
             teamNameTextBox.setText(i.getTeamName());
-            captainNameTextBox.setText(t.GetCaptain());
-            int spinnerPosition = spinnerAdapter.getPosition(t.GetColour());
+            captainNameTextBox.setText(t.getCaptain());
+            int spinnerPosition = spinnerAdapter.getPosition(t.getColour());
             colourSpinner.setSelection(spinnerPosition);
 
         }

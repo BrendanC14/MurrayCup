@@ -1,35 +1,21 @@
 package com.CutlerDevelopment.murraycup.Activities;
 
-import android.annotation.SuppressLint;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.MenuItem;
 import android.widget.TextView;
-
-import androidx.core.app.NavUtils;
 
 import com.CutlerDevelopment.murraycup.Models.DataHolder;
 import com.CutlerDevelopment.murraycup.Models.DatabaseConnectionHandler;
 import com.CutlerDevelopment.murraycup.Models.Team;
 import com.CutlerDevelopment.murraycup.R;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -59,6 +45,9 @@ public class GroupAdminMenu extends AppCompatActivity {
 
     public void AutoSortGroups (View view) {
 
+        for (Team t : DataHolder.getInstance().GetAllTeams()) {
+            dbcHandler.UpdateDocumentIntField("teams",t.getFirestoreReference(),"Group",0);
+        }
 
         int numGroups = Integer.parseInt(numGroupsTextBox.getText().toString());
         List<Team> allTeams = DataHolder.getInstance().GetAllTeams();
@@ -66,7 +55,7 @@ public class GroupAdminMenu extends AppCompatActivity {
         HashMap<String, ArrayList<Team>> teamColourMap = new HashMap<String, ArrayList<Team>>();
 
         for (Team t : allTeams) {
-            String colour = t.GetColour();
+            String colour = t.getColour();
 
             if (!teamColourMap.containsKey(colour)) {
                 teamColourMap.put(colour, new ArrayList<Team>());
@@ -79,8 +68,8 @@ public class GroupAdminMenu extends AppCompatActivity {
         for (Map.Entry<String, ArrayList<Team>> entry : teamColourMap.entrySet()) {
             for (Team t : entry.getValue()) {
                 DataHolder.getInstance().AddTeamToGroup(group, t);
-                t.SetGroup(group);
-                dbcHandler.UpdateDocumentIntField("teams", t.GetFirestoreReference(), "Group", group);
+                t.setGroup(group);
+                dbcHandler.UpdateDocumentIntField("teams", t.getFirestoreReference(), "Group", group);
                 group++;
                 if (group > numGroups) { group = 1; }
             }
